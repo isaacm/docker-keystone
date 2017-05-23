@@ -28,12 +28,13 @@ rm -f $SQL_SCRIPT
 sed -i "s#^admin_token.*=.*#admin_token = $ADMIN_TOKEN#" $CONFIG_FILE
 
 # Populate the Identity service database
+# db_sync will handle migrations for all installed extensions
 keystone-manage db_sync
 # Initialize Fernet keys
 keystone-manage fernet_setup --keystone-user root --keystone-group root
 mv /etc/keystone/default_catalog.templates /etc/keystone/default_catalog
 
-# start keystone service 
+# start keystone service
 uwsgi --http 0.0.0.0:35357 --wsgi-file $(which keystone-wsgi-admin) &
 # uwsgi --http 0.0.0.0:5000 --wsgi-file $(which keystone-wsgi-public) &
 sleep 5 # wait for start

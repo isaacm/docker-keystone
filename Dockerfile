@@ -19,8 +19,15 @@ RUN curl -fSL https://github.com/openstack/keystone/archive/${VERSION}.tar.gz -o
     && cd - \
     && rm -rf keystone-${VERSION}*
 
+RUN git clone -b fix-imports https://github.com/isaacm/keystone-oauth2-extension.git
+RUN cp -Rv keystone-oauth2-extension/oauth2 /usr/local/lib/python2.7/site-packages/keystone/contrib
+RUN cp -v keystone-oauth2-extension/tests/* /usr/local/lib/python2.7/site-packages/keystone/tests
+RUN cp -v keystone-oauth2-extension/plugins/oauth2.py /usr/local/lib/python2.7/site-packages/keystone/auth/plugins
+
 COPY keystone.conf /etc/keystone/keystone.conf
 COPY keystone.sql /root/keystone.sql
+COPY keystone-paste.ini /etc/keystone/keystone-paste.ini
+COPY policy.json /etc/keystone/policy.json
 
 # Add bootstrap script and make it executable
 COPY bootstrap.sh /etc/bootstrap.sh
